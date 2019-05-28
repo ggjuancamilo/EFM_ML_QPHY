@@ -13,7 +13,7 @@ import time
 
 ### Input parameters: ###
 T_list = np.linspace(5.0,0.5,10) #temperature list
-L = 4                            #linear size of the lattice
+L = 8                            #linear size of the lattice
 N_spins = L**2                   #total number of spins
 J = 1                            #coupling parameter
 
@@ -21,7 +21,7 @@ J = 1                            #coupling parameter
 Tc = 2.0/np.log(1.0 + np.sqrt(2))*J  #T/J ~ 2.269
 
 ### Monte Carlo parameters: ###
-n_eqSweeps = 0   #number of equilibration sweeps
+n_eqSweeps = 10   #number of equilibration sweeps
 n_measSweeps = 20  #number of measurement sweeps
 
 ### Parameters needed to show animation of spin configurations: ###
@@ -45,25 +45,47 @@ for i in range(N_spins):
   neighbours[i,0]=i+1
   if i%L==(L-1):
     neighbours[i,0]=i+1-L
-  
+
   #upwards neighbour:
   neighbours[i,1]=i+L
   if i >= (N_spins-L):
-    neighbours[i,1]=i+L-N_spins
+      neighbours[i,1]=i+L-N_spins
 
-  # *********************************************************************** #
-  # **********          1a) FILL IN CODE TO CALCULATE           *********** #
-  # **********  THE NEIGHBOUR TO THE LEFT (IN neighbours[i,2])  *********** #
-  # ********** AND THE DOWNWARDS NEIGHBOUR (IN neighbours[i,3]) *********** #
-  # *********************************************************************** #
-#end of for loop
+  neighbours[i,2]=i-1
+  if i%L==0:
+      neighbours[i,2]=i-1+L
+
+ #downwards neighbour:
+  neighbours[i,3]=i-L
+  if i <= (L-1):
+     neighbours[i,3]=i-L+N_spins
 
 ### Function to calculate the total energy ###
 def getEnergy():
   currEnergy = 0
   for i in range(N_spins):
-    currEnergy += -J*( spins[i]*spins[neighbours[i,0]] + spins[i]*spins[neighbours[i,1]] )
+      partialEnergy=0
+      for j in range(4):
+          partialEnergy += -J*( spins[i]*spins[neighbours[i,j]])
+      currEnergy +=  partialEnergy
+
   return currEnergy
+#
+# def deltaEn(site):
+#     deltaE=0
+#     currEnergy = 0
+#     newEnergy = 0
+#     for i in range(N_spins):
+#         partialEnergy=0
+#         for j in range(4):
+#             partialEnergy += -J*( spins[i]*spins[neighbours[i,j]])
+#         if(i!=site):
+#             currEnergy +=  partialEnergy
+#             newEnergy += partialEnergy
+#         else:
+#             currEnergy +=  partialEnergy
+#             newEnergy += -partialEnergy
+#     return newEnergy - currEnergy
 #end of getEnergy() function
 
 ### Function to calculate the total magnetization ###
@@ -77,19 +99,24 @@ def sweep():
   for i in range(N_spins):
     #randomly choose which spin to consider flipping:
     site = random.randint(0,N_spins-1)
-    
-    #calculate the change in energy for the proposed move:
-    E_init = getEnergy()
-    spins[site] = -spins[site] #flip the spin before calculating E_final
-    E_final = getEnergy()
-    spins[site] = -spins[site] #flip the spin back since we might not accept the move
-    deltaE = E_final - E_init
+
+    # # #calculate the change in energy for the proposed move:
+    # E_init = getEnergy()
+    # spins[site] = -spins[site] #flip the spin before calculating E_final
+    # E_final = getEnergy()
+    # spins[site] = -spins[site] #flip the spin back since we might not accept the move
+    # #
+    # deltaE = E_final - E_init
+    # # deltaE = deltaEn(site)
+
+    deltaE =
+
     # *********************************************************************** #
     # ************       1c) REPLACE THE ABOVE FIVE LINES.        *********** #
     # ************ FILL IN CODE TO CALCULATE THE CHANGE IN ENERGY *********** #
     # ************     USING ONLY THE FOUR NEAREST NEIGHBOURS     *********** #
     # *********************************************************************** #
-  
+
     if (deltaE <= 0) or (random.random() < np.exp(-deltaE/T)):  #Metropolis algorithm
       #flip the spin:
       spins[site] = -spins[site]
@@ -102,11 +129,11 @@ def sweep():
 t1 = time.clock() #for timing
 for T in T_list:
   print('\nT = %f' %T)
-  
+
   #open a file where observables will be recorded:
   fileName         = '%s/ising2d_L%d_T%.4f.txt' %(results_dir,L,T)
   file_observables = open(fileName, 'w')
-  
+
   #equilibration sweeps:
   for i in range(n_eqSweeps):
     sweep()
