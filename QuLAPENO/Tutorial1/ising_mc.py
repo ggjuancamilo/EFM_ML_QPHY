@@ -71,21 +71,21 @@ def getEnergy():
 
   return currEnergy
 #
-# def deltaEn(site):
-#     deltaE=0
-#     currEnergy = 0
-#     newEnergy = 0
-#     for i in range(N_spins):
-#         partialEnergy=0
-#         for j in range(4):
-#             partialEnergy += -J*( spins[i]*spins[neighbours[i,j]])
-#         if(i!=site):
-#             currEnergy +=  partialEnergy
-#             newEnergy += partialEnergy
-#         else:
-#             currEnergy +=  partialEnergy
-#             newEnergy += -partialEnergy
-#     return newEnergy - currEnergy
+def deltaEn(site):
+    deltaE=0
+    currEnergy = 0
+    newEnergy = 0
+    for i in range(N_spins):
+        partialEnergy=0
+        for j in range(4):
+            partialEnergy += -J*( spins[i]*spins[neighbours[i,j]])
+        if(i!=site):
+            currEnergy +=  partialEnergy
+            newEnergy += partialEnergy
+        else:
+            currEnergy +=  partialEnergy
+            newEnergy += -partialEnergy
+    return newEnergy - currEnergy
 #end of getEnergy() function
 
 ### Function to calculate the total magnetization ###
@@ -107,9 +107,9 @@ def sweep():
     # spins[site] = -spins[site] #flip the spin back since we might not accept the move
     # #
     # deltaE = E_final - E_init
-    # # deltaE = deltaEn(site)
+    deltaE = deltaEn(site)
 
-    deltaE =
+    # deltaE =
 
     # *********************************************************************** #
     # ************       1c) REPLACE THE ABOVE FIVE LINES.        *********** #
